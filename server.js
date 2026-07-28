@@ -4,7 +4,6 @@ const express = require("express");
 const session = require("express-session");
 const rateLimit = require("express-rate-limit");
 const passport = require("./config/passport");
-const sessionConfig = require("./config/session");
 const routes = require("./routes");
 const requestLogger = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
@@ -25,7 +24,18 @@ const globalLimiter = rateLimit({
 
 app.use(globalLimiter);
 app.use(express.static("public"));
-app.use(session(sessionConfig));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "change-this-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+    },
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(requestLogger);
