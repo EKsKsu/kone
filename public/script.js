@@ -1,34 +1,23 @@
-function getCookie(name) {
+fetch("/api/user")
+.then(res => res.json())
+.then(data => {
 
-    const value =
-        "; " + document.cookie;
+    if(!data.loggedIn){
 
-    const parts =
-        value.split("; " + name + "=");
+        location.href="/";
 
-    if (parts.length === 2)
-        return parts.pop().split(";").shift();
+        return;
 
-}
+    }
 
-const raw = getCookie("discordUser");
+    document.getElementById("user").innerHTML=`
 
-if (!raw) {
+    <img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png" width="120">
 
-    document.getElementById("profile")
-        .innerHTML =
-        "Not logged in.";
+    <h2>${data.username}</h2>
 
-}
-else {
+    <p>${data.id}</p>
 
-    const user = JSON.parse(raw);
+    `;
 
-    document.getElementById("profile")
-        .innerHTML = `
-            <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" width="120">
-            <h2>${user.username}</h2>
-            <p>ID: ${user.id}</p>
-        `;
-
-}
+});
