@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const session = require("express-session");
+const rateLimit = require("express-rate-limit");
 const passport = require("./config/passport");
 const sessionConfig = require("./config/session");
 const routes = require("./routes");
@@ -11,6 +12,18 @@ const { DEFAULT_PORT } = require("./config/constants");
 
 const app = express();
 
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(globalLimiter);
 app.use(express.static("public"));
 app.use(session(sessionConfig));
 app.use(passport.initialize());
